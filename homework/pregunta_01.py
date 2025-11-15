@@ -4,7 +4,8 @@
 """
 Escriba el codigo que ejecute la accion solicitada en cada pregunta.
 """
-
+import pandas as pd
+import os
 
 def pregunta_01():
     """
@@ -71,3 +72,34 @@ def pregunta_01():
 
 
     """
+    
+    train_dir = os.path.join("files/input", "train")
+    test_dir = os.path.join("files/input", "test")
+
+    
+    def create_dataset(data_dir):
+        data = []
+        for sentiment in ["negative", "positive", "neutral"]:
+            sentiment_dir = os.path.join(data_dir, sentiment)
+            for filename in os.listdir(sentiment_dir):
+                if filename.endswith(".txt"):
+                    file_path = os.path.join(sentiment_dir, filename)
+                    with open(file_path, 'r', encoding='utf-8') as file:
+                        phrase = file.read().strip()
+                        data.append({"phrase": phrase, "target": sentiment})
+        return pd.DataFrame(data)
+
+    # Crear los datasets de entrenamiento y prueba
+    train_dataset = create_dataset(train_dir)
+    test_dataset = create_dataset(test_dir)
+
+    
+    output_dir = "files/output"
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Guardar los datasets en archivos CSV
+    train_dataset.to_csv(os.path.join(output_dir, "train_dataset.csv"), index=False)
+    test_dataset.to_csv(os.path.join(output_dir, "test_dataset.csv"), index=False)
+    
+if __name__ == "__main__":
+    pregunta_01()
